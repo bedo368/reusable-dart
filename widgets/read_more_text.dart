@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-// Custom widget to display text with a "Read more" option
+// ويدجت مخصص لعرض النص مع خيار "قراءة المزيد"
 class ReadMoreText extends StatefulWidget {
   final String text; // The text to be displayed
   final int maxLines; // Maximum number of lines to display before truncating
@@ -8,6 +8,7 @@ class ReadMoreText extends StatefulWidget {
   final TextStyle? readmeStyle; // Style for the "Read more" text
 
   // Constructor
+  // البناء
   const ReadMoreText({
     Key? key,
     required this.text,
@@ -18,11 +19,20 @@ class ReadMoreText extends StatefulWidget {
 
   @override
   createState() => _ReadMoreTextState(); // Create state for the widget
+  // إنشاء حالة للويدجت
 }
 
 // State class for ReadMoreText widget
+// حالة الويدجت لـ ReadMoreText
 class _ReadMoreTextState extends State<ReadMoreText> {
-  bool _isExpanded = false; // Flag to track if text is expanded
+  late bool _isExpanded; // Flag to track if text is expanded
+  // علم لتتبع حالة توسيع النص
+
+  @override
+  void initState() {
+    super.initState();
+    _isExpanded = false; // Set initial expansion state
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -43,57 +53,68 @@ class _ReadMoreTextState extends State<ReadMoreText> {
           ),
         ),
         // Display "Read more" option if text exceeds maximum lines
-        if ((_getNumberOfLines(context, widget.text, widget.style!) >
-            widget.maxLines))
-          Transform.translate(
-            offset: Offset(
-                !_isExpanded
-                    ? 0
-                    : -MediaQuery.of(context).size.width +
-                        95 +
-                        MediaQuery.of(context).size.width * .045,
-                !_isExpanded ? -20 : 0),
-            child: Align(
-              alignment: Alignment.bottomRight,
-              child: InkWell(
-                onTap: () {
-                  setState(() {
-                    _isExpanded = !_isExpanded; // Toggle text expansion
-                  });
-                },
-                child: Container(
-                  padding: const EdgeInsets.only(left: 5),
-                  color: Colors.white,
-                  child: Text(
-                    _isExpanded
-                        ? 'Read less'
-                        : '... Read more', // Display appropriate text based on expansion state
-                    style: widget.readmeStyle, // Apply the specified style
-                  ),
-                ),
-              ),
-            ),
-          ),
+        // عرض خيار "قراءة المزيد" إذا تجاوز النص الحد الأقصى للأسطر
+        if (_getNumberOfLines(context, widget.text, widget.style!) >
+            widget.maxLines)
+          _buildReadMoreOption(context),
       ],
     );
   }
-}
 
-// Function to calculate the number of lines in the text
-int _getNumberOfLines(
-    BuildContext context, String textCalc, TextStyle textStyle) {
-  // Create a TextPainter object
-  final textPainter = TextPainter(
-    text: TextSpan(
-        text: textCalc,
-        style: textStyle), // Use the same text style as your Text widget
-    maxLines: 999, // A very high number of lines
-    textDirection: TextDirection.ltr,
-  );
+  // Function to build the "Read more" option
+  // دالة لبناء خيار "قراءة المزيد"
+  Widget _buildReadMoreOption(BuildContext context) {
+    return Transform.translate(
+      offset: Offset(
+          !_isExpanded
+              ? 0
+              : -MediaQuery.of(context).size.width +
+                  95 +
+                  MediaQuery.of(context).size.width * .045,
+          !_isExpanded ? -20 : 0),
+      child: Align(
+        alignment: Alignment.bottomRight,
+        child: InkWell(
+          onTap: () {
+            setState(() {
+              _isExpanded = !_isExpanded; // Toggle text expansion
+            });
+          },
+          child: Container(
+            padding: const EdgeInsets.only(left: 5),
+            color: Colors.white,
+            child: Text(
+              _isExpanded
+                  ? 'Read less'
+                  : '... Read more', // Display appropriate text based on expansion state
+              style: widget.readmeStyle, // Apply the specified style
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 
-  // Layout the text
-  textPainter.layout(maxWidth: MediaQuery.of(context).size.width);
+  // Function to calculate the number of lines in the text
+  // الدالة لحساب عدد الأسطر في النص
+  int _getNumberOfLines(
+      BuildContext context, String textCalc, TextStyle textStyle) {
+    // Create a TextPainter object
+    // إنشاء كائن TextPainter
+    final textPainter = TextPainter(
+      text: TextSpan(
+          text: textCalc,
+          style: textStyle), // Use the same text style as your Text widget
+      maxLines: 999, // A very high number of lines
+      textDirection: TextDirection.ltr,
+    );
 
-  // Return the actual number of lines
-  return textPainter.computeLineMetrics().length;
+    // Layout the text
+    // تخطيط النص
+    textPainter.layout(maxWidth: MediaQuery.of(context).size.width);
+
+    // Return the actual number of lines
+    // إرجاع عدد الأسطر الفعلي
+    return textPainter.computeLineMetrics().length;
+  }
 }
